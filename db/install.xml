@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/coursestudio/db" VERSION="2026041100" COMMENT="Course Studio module tables">
+  <TABLES>
+    <TABLE NAME="coursestudio" COMMENT="Course Studio activity instances">
+      <FIELDS>
+        <FIELD NAME="id"            TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course"        TYPE="int"  LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="Moodle course id"/>
+        <FIELD NAME="name"          TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="" COMMENT="Activity name"/>
+        <FIELD NAME="intro"         TYPE="text"             NOTNULL="false" COMMENT="Activity description"/>
+        <FIELD NAME="introformat"   TYPE="int"  LENGTH="4"  NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="courseid"      TYPE="char" LENGTH="128" NOTNULL="true" DEFAULT="" COMMENT="Course Studio course UUID"/>
+        <FIELD NAME="iframeheight"  TYPE="int"  LENGTH="5"  NOTNULL="true" DEFAULT="700"/>
+        <FIELD NAME="gradeenabled"  TYPE="int"  LENGTH="1"  NOTNULL="true" DEFAULT="1"/>
+        <FIELD NAME="grademax"      TYPE="int"  LENGTH="10" NOTNULL="true" DEFAULT="100"/>
+        <FIELD NAME="timecreated"   TYPE="int"  LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="timemodified"  TYPE="int"  LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>
