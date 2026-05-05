@@ -37,7 +37,7 @@ define(['core/ajax', 'core/notification'], function(Ajax, Notification) {
                 return;
             }
 
-            var data = e.data;
+            const data = e.data;
 
             if (data.type === 'CS_COMPLETE') {
                 Ajax.call([{
@@ -51,7 +51,7 @@ define(['core/ajax', 'core/notification'], function(Ajax, Notification) {
             }
 
             if (data.type === 'CS_RESIZE' && data.height) {
-                var iframe = document.getElementById('cs-iframe-' + cmid);
+                const iframe = document.getElementById('cs-iframe-' + cmid);
                 if (iframe) {
                     iframe.style.height = data.height + 'px';
                 }
