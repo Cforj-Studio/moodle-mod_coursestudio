@@ -7,6 +7,15 @@
     * cmid     - int    - Course module ID (used for unique element IDs)
     * embedurl - string - Full embed URL for the course player
     * height   - int    - Initial iframe height in pixels
+    * pluginname - string - Plugin display name
+
+    Example context (json):
+    {
+        "cmid": 1,
+        "embedurl": "https://app.cforj.studio/embed/example-course-id",
+        "height": 700,
+        "pluginname": "Course Studio"
+    }
 }}
 <div id="cs-embed-{{cmid}}"
      class="coursestudio-embed"

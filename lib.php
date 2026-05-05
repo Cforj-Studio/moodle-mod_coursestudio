@@ -105,7 +105,14 @@ function coursestudio_grade_item_update($instance, $grades = null) {
 
     if (empty($instance->gradeenabled)) {
         return grade_update(
-            'mod/coursestudio', $instance->course, 'mod', 'coursestudio', $instance->id, 0, null, ['deleted' => 1]
+            'mod/coursestudio',
+            $instance->course,
+            'mod',
+            'coursestudio',
+            $instance->id,
+            0,
+            null,
+            ['deleted' => 1]
         );
     }
 
@@ -117,7 +124,14 @@ function coursestudio_grade_item_update($instance, $grades = null) {
     ];
 
     return grade_update(
-        'mod/coursestudio', $instance->course, 'mod', 'coursestudio', $instance->id, 0, $grades, $item
+        'mod/coursestudio',
+        $instance->course,
+        'mod',
+        'coursestudio',
+        $instance->id,
+        0,
+        $grades,
+        $item
     );
 }
 
