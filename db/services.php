@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin admin settings for mod_coursestudio.
+ * External services definition for mod_coursestudio.
  *
  * @package    mod_coursestudio
  * @copyright  2026 cforj.studio
@@ -24,27 +24,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_configtext(
-        'mod_coursestudio/apiurl',
-        get_string('apiurl', 'coursestudio'),
-        get_string('apiurl_desc', 'coursestudio'),
-        'https://app.cforj.studio',
-        PARAM_URL
-    ));
-
-    $settings->add(new admin_setting_configpasswordunmask(
-        'mod_coursestudio/apikey',
-        get_string('apikey', 'coursestudio'),
-        get_string('apikey_desc', 'coursestudio'),
-        ''
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'mod_coursestudio/defaultheight',
-        get_string('defaultheight', 'coursestudio'),
-        get_string('defaultheight_desc', 'coursestudio'),
-        '700',
-        PARAM_INT
-    ));
-}
+$functions = [
+    'mod_coursestudio_submit_grade' => [
+        'classname'     => 'mod_coursestudio\external\submit_grade',
+        'methodname'    => 'execute',
+        'description'   => 'Submit a grade from the Course Studio player to the Moodle gradebook.',
+        'type'          => 'write',
+        'ajax'          => true,
+        'loginrequired' => true,
+        'capabilities'  => 'mod/coursestudio:view',
+    ],
+];

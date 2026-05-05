@@ -1,0 +1,22 @@
+{{!
+    @template mod_coursestudio/view
+
+    Renders the Course Studio player iframe inside a Moodle activity page.
+
+    Context variables required for this template:
+    * cmid     - int    - Course module ID (used for unique element IDs)
+    * embedurl - string - Full embed URL for the course player
+    * height   - int    - Initial iframe height in pixels
+}}
+<div id="cs-embed-{{cmid}}"
+     class="coursestudio-embed"
+     style="width:100%;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);">
+    <iframe
+        id="cs-iframe-{{cmid}}"
+        src="{{embedurl}}"
+        style="width:100%;height:{{height}}px;border:none;"
+        allow="fullscreen"
+        data-cmid="{{cmid}}"
+        title="{{pluginname}}"
+    ></iframe>
+</div>

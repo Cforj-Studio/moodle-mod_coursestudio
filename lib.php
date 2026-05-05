@@ -1,6 +1,21 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 /**
- * Library functions for mod_coursestudio
+ * Library functions for mod_coursestudio.
  *
  * @package    mod_coursestudio
  * @copyright  2026 cforj.studio
@@ -10,27 +25,42 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Add a Course Studio instance
+ * Add a new Course Studio instance to the database.
+ *
+ * @param stdClass $data Form data.
+ * @param moodleform|null $mform The mod form.
+ * @return int New instance ID.
  */
 function coursestudio_add_instance($data, $mform = null) {
     global $DB;
-    $data->timecreated = time();
+    $data->timecreated  = time();
     $data->timemodified = time();
-    return $DB->insert_record('coursestudio', $data);
+    $id = $DB->insert_record('coursestudio', $data);
+    coursestudio_grade_item_update($data);
+    return $id;
 }
 
 /**
- * Update a Course Studio instance
+ * Update an existing Course Studio instance.
+ *
+ * @param stdClass $data Form data.
+ * @param moodleform|null $mform The mod form.
+ * @return bool True on success.
  */
 function coursestudio_update_instance($data, $mform = null) {
     global $DB;
     $data->timemodified = time();
-    $data->id = $data->instance;
-    return $DB->update_record('coursestudio', $data);
+    $data->id           = $data->instance;
+    $result = $DB->update_record('coursestudio', $data);
+    coursestudio_grade_item_update($data);
+    return $result;
 }
 
 /**
- * Delete a Course Studio instance
+ * Delete a Course Studio instance.
+ *
+ * @param int $id Instance ID.
+ * @return bool True on success.
  */
 function coursestudio_delete_instance($id) {
     global $DB;
@@ -42,21 +72,34 @@ function coursestudio_delete_instance($id) {
 }
 
 /**
- * Supported features
+ * Return supported Moodle features.
+ *
+ * @param string $feature Feature constant.
+ * @return bool|null True if supported, null if unknown.
  */
 function coursestudio_supports($feature) {
     switch ($feature) {
-        case FEATURE_MOD_INTRO:           return true;
-        case FEATURE_SHOW_DESCRIPTION:    return true;
-        case FEATURE_GRADE_HAS_GRADE:     return true;
-        case FEATURE_BACKUP_MOODLE2:      return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
-        default: return null;
+        case FEATURE_MOD_INTRO:
+            return true;
+        case FEATURE_SHOW_DESCRIPTION:
+            return true;
+        case FEATURE_GRADE_HAS_GRADE:
+            return true;
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return true;
+        default:
+            return null;
     }
 }
 
 /**
- * Create grade item for given instance
+ * Create or update the grade item for a Course Studio instance.
+ *
+ * @param stdClass $instance The instance record.
+ * @param mixed $grades Optional grade data.
+ * @return int Grade update result code.
  */
 function coursestudio_grade_item_update($instance, $grades = null) {
     global $CFG;
@@ -69,8 +112,8 @@ function coursestudio_grade_item_update($instance, $grades = null) {
 
     $item = [
         'itemname' => $instance->name,
-        'grademax'  => (int)$instance->grademax,
-        'grademin'  => 0,
+        'grademax' => (int) $instance->grademax,
+        'grademin' => 0,
         'gradetype' => GRADE_TYPE_VALUE,
     ];
 
@@ -79,7 +122,11 @@ function coursestudio_grade_item_update($instance, $grades = null) {
 }
 
 /**
- * Update grades in the gradebook
+ * Update grades in the gradebook.
+ *
+ * @param stdClass $instance The instance record.
+ * @param int $userid Optional user ID (0 = all users).
+ * @param bool $nullifnone If true, set null grades if none exist.
  */
 function coursestudio_update_grades($instance, $userid = 0, $nullifnone = true) {
     coursestudio_grade_item_update($instance);

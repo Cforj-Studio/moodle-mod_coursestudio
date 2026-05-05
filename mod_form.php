@@ -1,6 +1,21 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 /**
- * Activity creation / editing form
+ * Activity creation and editing form for mod_coursestudio.
  *
  * @package    mod_coursestudio
  * @copyright  2026 cforj.studio
@@ -68,7 +83,7 @@ class mod_coursestudio_mod_form extends moodleform_mod {
             $errors['courseid'] = get_string('required');
         }
 
-        if (!empty($data['gradeenabled']) && (int)$data['grademax'] < 1) {
+        if (!empty($data['gradeenabled']) && (int) $data['grademax'] < 1) {
             $errors['grademax'] = get_string('grademaxerror', 'coursestudio');
         }
 

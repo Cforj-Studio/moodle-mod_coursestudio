@@ -1,6 +1,21 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 /**
- * View Course Studio activity
+ * View a Course Studio activity.
  *
  * @package    mod_coursestudio
  * @copyright  2026 cforj.studio
@@ -10,60 +25,53 @@
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/mod/coursestudio/lib.php');
 
-$id = required_param('id', PARAM_INT); // Course Module ID
+$id = required_param('id', PARAM_INT);
 
-$cm = get_coursemodule_from_id('coursestudio', $id, 0, false, MUST_EXIST);
-$course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+$cm       = get_coursemodule_from_id('coursestudio', $id, 0, false, MUST_EXIST);
+$course   = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $instance = $DB->get_record('coursestudio', ['id' => $cm->instance], '*', MUST_EXIST);
 
 require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/coursestudio:view', $context);
 
-// Completion
+// Trigger course_module_viewed event and mark completion.
+$event = \mod_coursestudio\event\course_module_viewed::create([
+    'objectid' => $instance->id,
+    'context'  => $context,
+]);
+$event->add_record_snapshot('course_modules', $cm);
+$event->add_record_snapshot('course', $course);
+$event->add_record_snapshot('coursestudio', $instance);
+$event->trigger();
+
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
 $PAGE->set_url('/mod/coursestudio/view.php', ['id' => $id]);
-$PAGE->set_title($instance->name);
-$PAGE->set_heading($course->fullname);
+$PAGE->set_title(format_string($instance->name));
+$PAGE->set_heading(format_string($course->fullname));
 
-$api_url = get_config('mod_coursestudio', 'apiurl') ?: 'https://app.cforj.studio';
-$course_id = $instance->courseid;
-$height = (int)($instance->iframeheight ?: 700);
+$apiurl    = get_config('mod_coursestudio', 'apiurl') ?: 'https://app.cforj.studio';
+$courseid  = $instance->courseid;
+$height    = (int) ($instance->iframeheight ?: 700);
+
+$templatecontext = [
+    'cmid'       => $cm->id,
+    'embedurl'   => rtrim($apiurl, '/') . '/embed/' . $courseid,
+    'height'     => $height,
+    'pluginname' => get_string('pluginname', 'coursestudio'),
+];
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($instance->name);
+echo $OUTPUT->heading(format_string($instance->name));
 
 if (!empty($instance->intro)) {
     echo $OUTPUT->box(format_module_intro('coursestudio', $instance, $cm->id), 'generalbox', 'intro');
 }
 
-// Render course iframe
-echo <<<HTML
-<div id="cs-embed" style="width:100%;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);">
-  <iframe
-    src="{$api_url}/embed/{$course_id}"
-    style="width:100%;height:{$height}px;border:none;"
-    allow="fullscreen"
-    id="cs-iframe"
-  ></iframe>
-</div>
-<script>
-window.addEventListener('message', function(e) {
-  if (e.data && e.data.type === 'CS_COMPLETE') {
-    // Send grade to Moodle via AJAX
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', M.cfg.wwwroot + '/mod/coursestudio/grade.php');
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.send('cmid={$cm->id}&score=' + encodeURIComponent(e.data.score || '') + '&sesskey=' + M.cfg.sesskey);
-  }
-  // Auto-resize iframe
-  if (e.data && e.data.type === 'CS_RESIZE' && e.data.height) {
-    document.getElementById('cs-iframe').style.height = e.data.height + 'px';
-  }
-});
-</script>
-HTML;
+echo $OUTPUT->render_from_template('mod_coursestudio/view', $templatecontext);
+
+$PAGE->requires->js_call_amd('mod_coursestudio/player', 'init', [$cm->id]);
 
 echo $OUTPUT->footer();

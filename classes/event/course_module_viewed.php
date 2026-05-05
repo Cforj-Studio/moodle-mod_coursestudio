@@ -15,36 +15,26 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin admin settings for mod_coursestudio.
+ * course_module_viewed event for mod_coursestudio.
  *
  * @package    mod_coursestudio
  * @copyright  2026 cforj.studio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_coursestudio\event;
+
 defined('MOODLE_INTERNAL') || die();
 
-if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_configtext(
-        'mod_coursestudio/apiurl',
-        get_string('apiurl', 'coursestudio'),
-        get_string('apiurl_desc', 'coursestudio'),
-        'https://app.cforj.studio',
-        PARAM_URL
-    ));
+class course_module_viewed extends \core\event\course_module_viewed {
 
-    $settings->add(new admin_setting_configpasswordunmask(
-        'mod_coursestudio/apikey',
-        get_string('apikey', 'coursestudio'),
-        get_string('apikey_desc', 'coursestudio'),
-        ''
-    ));
+    protected function init(): void {
+        $this->data['objecttable'] = 'coursestudio';
+        $this->data['crud']        = 'r';
+        $this->data['edulevel']    = self::LEVEL_PARTICIPATING;
+    }
 
-    $settings->add(new admin_setting_configtext(
-        'mod_coursestudio/defaultheight',
-        get_string('defaultheight', 'coursestudio'),
-        get_string('defaultheight_desc', 'coursestudio'),
-        '700',
-        PARAM_INT
-    ));
+    public static function get_objectid_mapping(): array {
+        return ['db' => 'coursestudio', 'restore' => 'coursestudio'];
+    }
 }
