@@ -29,34 +29,46 @@ use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_value;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->libdir . '/gradelib.php');
-require_once($CFG->libdir . '/completionlib.php');
-
+/**
+ * External function for submitting a player grade to the Moodle gradebook.
+ */
 class submit_grade extends external_api {
-
+    /**
+     * Describe the parameters accepted by execute().
+     *
+     * @return external_function_parameters Parameter description.
+     */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'cmid'  => new external_value(PARAM_INT,   'Course module ID'),
+            'cmid' => new external_value(PARAM_INT, 'Course module ID'),
             'score' => new external_value(PARAM_FLOAT, 'Raw score (0-1 fraction or absolute value)'),
         ]);
     }
 
+    /**
+     * Submit a grade from the Course Studio player.
+     *
+     * @param int $cmid Course module ID.
+     * @param float $score Raw score from the player.
+     * @return array Result data including success flag and recorded score.
+     */
     public static function execute(int $cmid, float $score): array {
         global $DB, $USER, $CFG;
 
+        require_once($CFG->libdir . '/gradelib.php');
+        require_once($CFG->libdir . '/completionlib.php');
+
         $params = self::validate_parameters(self::execute_parameters(), [
-            'cmid'  => $cmid,
+            'cmid' => $cmid,
             'score' => $score,
         ]);
 
-        $cm       = get_coursemodule_from_id('coursestudio', $params['cmid'], 0, false, MUST_EXIST);
-        $context  = \context_module::instance($cm->id);
+        $cm = get_coursemodule_from_id('coursestudio', $params['cmid'], 0, false, MUST_EXIST);
+        $context = \context_module::instance($cm->id);
         self::validate_context($context);
         require_capability('mod/coursestudio:view', $context);
 
-        $course   = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+        $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
         $instance = $DB->get_record('coursestudio', ['id' => $cm->instance], '*', MUST_EXIST);
 
         if (empty($instance->gradeenabled)) {
@@ -66,14 +78,13 @@ class submit_grade extends external_api {
         $rawscore = is_numeric($params['score']) ? (float) $params['score'] : 0.0;
         $grademax = max(1, (int) $instance->grademax);
 
-        // If score is a 0-1 fraction, scale to grade max.
         if ($rawscore > 0 && $rawscore <= 1) {
             $rawscore = $rawscore * $grademax;
         }
         $rawscore = min($grademax, max(0.0, $rawscore));
 
-        $grade           = new \stdClass();
-        $grade->userid   = $USER->id;
+        $grade = new \stdClass();
+        $grade->userid = $USER->id;
         $grade->rawgrade = $rawscore;
         grade_update('mod/coursestudio', $course->id, 'mod', 'coursestudio', $instance->id, 0, $grade);
 
@@ -85,12 +96,17 @@ class submit_grade extends external_api {
         return ['ok' => true, 'grading' => true, 'score' => $rawscore, 'max' => $grademax];
     }
 
+    /**
+     * Describe the return value of execute().
+     *
+     * @return external_single_structure Return value description.
+     */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-            'ok'      => new external_value(PARAM_BOOL,  'Success flag'),
-            'grading' => new external_value(PARAM_BOOL,  'Whether grading is enabled for this activity'),
-            'score'   => new external_value(PARAM_FLOAT, 'Recorded score'),
-            'max'     => new external_value(PARAM_INT,   'Maximum grade'),
+            'ok' => new external_value(PARAM_BOOL, 'Success flag'),
+            'grading' => new external_value(PARAM_BOOL, 'Whether grading is enabled for this activity'),
+            'score' => new external_value(PARAM_FLOAT, 'Recorded score'),
+            'max' => new external_value(PARAM_INT, 'Maximum grade'),
         ]);
     }
 }

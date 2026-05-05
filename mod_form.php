@@ -26,38 +26,36 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
 
+/**
+ * Module instance settings form for mod_coursestudio.
+ */
 class mod_coursestudio_mod_form extends moodleform_mod {
-
+    /**
+     * Define form elements.
+     */
     public function definition() {
         $mform = $this->_form;
 
-        // General section.
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        // Activity name.
         $mform->addElement('text', 'name', get_string('name', 'coursestudio'), ['size' => '64']);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
-        // Description (intro).
         $this->standard_intro_elements();
 
-        // Course Studio section.
         $mform->addElement('header', 'coursestudiohdr', get_string('coursesettings', 'coursestudio'));
 
-        // Course ID from Course Studio.
         $mform->addElement('text', 'courseid', get_string('courseid', 'coursestudio'), ['size' => '48']);
         $mform->setType('courseid', PARAM_TEXT);
         $mform->addRule('courseid', null, 'required', null, 'client');
         $mform->addHelpButton('courseid', 'courseid', 'coursestudio');
 
-        // Iframe height.
         $mform->addElement('text', 'iframeheight', get_string('iframeheight', 'coursestudio'), ['size' => '6']);
         $mform->setType('iframeheight', PARAM_INT);
         $mform->setDefault('iframeheight', 700);
 
-        // Grade section.
         $mform->addElement('header', 'gradehdr', get_string('grade'));
 
         $mform->addElement('select', 'gradeenabled', get_string('gradeenabled', 'coursestudio'), [
@@ -71,11 +69,17 @@ class mod_coursestudio_mod_form extends moodleform_mod {
         $mform->setDefault('grademax', 100);
         $mform->disabledIf('grademax', 'gradeenabled', 'eq', 0);
 
-        // Standard elements.
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
     }
 
+    /**
+     * Validate the submitted form data.
+     *
+     * @param array $data Submitted data.
+     * @param array $files Submitted files.
+     * @return array Validation errors keyed by field name.
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

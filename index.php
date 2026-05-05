@@ -1,6 +1,21 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 /**
- * List all Course Studio instances in a course
+ * List all Course Studio instances in a course.
  *
  * @package    mod_coursestudio
  * @copyright  2026 cforj.studio
@@ -9,7 +24,7 @@
 
 require_once(__DIR__ . '/../../config.php');
 
-$id = required_param('id', PARAM_INT); // Course ID
+$id = required_param('id', PARAM_INT);
 
 $course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
 require_login($course);
@@ -24,13 +39,14 @@ echo $OUTPUT->heading(get_string('modulenameplural', 'coursestudio'));
 $instances = get_all_instances_in_course('coursestudio', $course);
 
 if (empty($instances)) {
-    notice(get_string('thereareno', 'moodle', get_string('modulenameplural', 'coursestudio')),
-        new moodle_url('/course/view.php', ['id' => $course->id]));
+    notice(
+        get_string('thereareno', 'moodle', get_string('modulenameplural', 'coursestudio')),
+        new moodle_url('/course/view.php', ['id' => $course->id])
+    );
 }
 
 $table = new html_table();
 $table->attributes['class'] = 'generaltable mod_index';
-
 $table->head  = [get_string('name'), get_string('courseid', 'coursestudio')];
 $table->align = ['left', 'left'];
 

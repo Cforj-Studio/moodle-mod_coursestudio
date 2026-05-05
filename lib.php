@@ -22,8 +22,6 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Add a new Course Studio instance to the database.
  *
@@ -106,8 +104,9 @@ function coursestudio_grade_item_update($instance, $grades = null) {
     require_once($CFG->libdir . '/gradelib.php');
 
     if (empty($instance->gradeenabled)) {
-        return grade_update('mod/coursestudio', $instance->course, 'mod', 'coursestudio',
-            $instance->id, 0, null, ['deleted' => 1]);
+        return grade_update(
+            'mod/coursestudio', $instance->course, 'mod', 'coursestudio', $instance->id, 0, null, ['deleted' => 1]
+        );
     }
 
     $item = [
@@ -117,8 +116,9 @@ function coursestudio_grade_item_update($instance, $grades = null) {
         'gradetype' => GRADE_TYPE_VALUE,
     ];
 
-    return grade_update('mod/coursestudio', $instance->course, 'mod', 'coursestudio',
-        $instance->id, 0, $grades, $item);
+    return grade_update(
+        'mod/coursestudio', $instance->course, 'mod', 'coursestudio', $instance->id, 0, $grades, $item
+    );
 }
 
 /**

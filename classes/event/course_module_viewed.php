@@ -24,16 +24,24 @@
 
 namespace mod_coursestudio\event;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Event fired when a user views a Course Studio activity.
+ */
 class course_module_viewed extends \core\event\course_module_viewed {
-
+    /**
+     * Initialise the event data.
+     */
     protected function init(): void {
         $this->data['objecttable'] = 'coursestudio';
         $this->data['crud']        = 'r';
         $this->data['edulevel']    = self::LEVEL_PARTICIPATING;
     }
 
+    /**
+     * Return the objectid mapping for restore.
+     *
+     * @return array Mapping definition.
+     */
     public static function get_objectid_mapping(): array {
         return ['db' => 'coursestudio', 'restore' => 'coursestudio'];
     }
