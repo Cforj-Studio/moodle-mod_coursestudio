@@ -22,36 +22,31 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['modulename'] = 'Course Studio';
-$string['modulenameplural'] = 'Активности Course Studio';
-$string['modulename_help'] = 'Встраивайте интерактивные курсы Course Studio прямо в Moodle. Поддержка авторесайза, оценок и отслеживания завершения.';
-$string['pluginname'] = 'Course Studio';
-$string['pluginadministration'] = 'Администрирование Course Studio';
-
-$string['name'] = 'Название активности';
-$string['coursesettings'] = 'Настройки Course Studio';
+$string['apikey'] = 'API ключ';
+$string['apikey_desc'] = 'API ключ для межсерверного взаимодействия (опционально, используется для обратных вызовов оценок)';
+$string['apiurl'] = 'URL Course Studio';
+$string['apiurl_desc'] = 'Базовый URL вашего экземпляра Course Studio (например, https://app.cforj.studio)';
 $string['courseid'] = 'ID курса';
 $string['courseid_help'] = 'UUID курса в Course Studio. Найдите его в настройках курса или в URL.';
-$string['iframeheight'] = 'Высота плеера (px)';
+$string['coursesettings'] = 'Настройки Course Studio';
+$string['coursestudio:addinstance'] = 'Добавить активность Course Studio';
+$string['coursestudio:grade'] = 'Оценивать активность Course Studio';
+$string['coursestudio:view'] = 'Просматривать активность Course Studio';
+$string['defaultheight'] = 'Высота плеера по умолчанию';
+$string['defaultheight_desc'] = 'Высота iframe по умолчанию в пикселях для новых активностей';
+$string['eventcoursemoduleviewed'] = 'Модуль курса просмотрен';
 $string['gradeenabled'] = 'Включить оценивание';
 $string['grademax'] = 'Максимальная оценка';
 $string['grademaxerror'] = 'Максимальная оценка должна быть не менее 1';
-
-$string['apiurl'] = 'URL Course Studio';
-$string['apiurl_desc'] = 'Базовый URL вашего экземпляра Course Studio (например, https://app.cforj.studio)';
-$string['apikey'] = 'API ключ';
-$string['apikey_desc'] = 'API ключ для межсерверного взаимодействия (опционально, используется для обратных вызовов оценок)';
-$string['defaultheight'] = 'Высота плеера по умолчанию';
-$string['defaultheight_desc'] = 'Высота iframe по умолчанию в пикселях для новых активностей';
-
-$string['coursestudio:addinstance'] = 'Добавить активность Course Studio';
-$string['coursestudio:view'] = 'Просматривать активность Course Studio';
-$string['coursestudio:grade'] = 'Оценивать активность Course Studio';
-
-$string['eventcoursemoduleviewed'] = 'Модуль курса просмотрен';
+$string['iframeheight'] = 'Высота плеера (px)';
+$string['modulename'] = 'Course Studio';
+$string['modulename_help'] = 'Встраивайте интерактивные курсы Course Studio прямо в Moodle. Поддержка авторесайза, оценок и отслеживания завершения.';
+$string['modulenameplural'] = 'Активности Course Studio';
+$string['name'] = 'Название активности';
+$string['pluginadministration'] = 'Администрирование Course Studio';
+$string['pluginname'] = 'Course Studio';
+$string['privacy:metadata'] = 'Плагин Course Studio не хранит персональные данные в своих таблицах.';
+$string['privacy:metadata:core_completion'] = 'Данные о завершении активности управляются подсистемой завершения Moodle.';
+$string['privacy:metadata:core_grades'] = 'Данные об оценках хранятся в журнале оценок Moodle через подсистему core_grades.';
 $string['submitgrade'] = 'Отправить оценку';
 $string['submitgrade_description'] = 'Отправляет оценку из плеера Course Studio в журнал оценок Moodle.';
-
-$string['privacy:metadata'] = 'Плагин Course Studio не хранит персональные данные в своих таблицах.';
-$string['privacy:metadata:core_grades'] = 'Данные об оценках хранятся в журнале оценок Moodle через подсистему core_grades.';
-$string['privacy:metadata:core_completion'] = 'Данные о завершении активности управляются подсистемой завершения Moodle.';

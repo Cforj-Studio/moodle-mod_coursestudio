@@ -24,42 +24,43 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax', 'core/notification'], function(Ajax, Notification) {
+import Ajax from 'core/ajax';
+import Notification from 'core/notification';
 
-    /**
-     * Initialise the player listener for a given course module.
-     *
-     * @param {number} cmid Course module ID
-     */
-    function init(cmid) {
-        window.addEventListener('message', function(e) {
-            if (!e.data || typeof e.data !== 'object') {
-                return;
+/**
+ * Initialise the player listener for a given course module.
+ *
+ * @param {number} cmid Course module ID
+ * @returns {void}
+ */
+const init = (cmid) => {
+    window.addEventListener('message', (e) => {
+        if (!e.data || typeof e.data !== 'object') {
+            return;
+        }
+
+        const data = e.data;
+
+        if (data.type === 'CS_COMPLETE') {
+            Ajax.call([{
+                methodname: 'mod_coursestudio_submit_grade',
+                args: {
+                    cmid,
+                    score: parseFloat(data.score) || 0
+                },
+                fail: Notification.exception
+            }]);
+        }
+
+        if (data.type === 'CS_RESIZE' && data.height) {
+            const iframe = document.getElementById('cs-iframe-' + cmid);
+            if (iframe) {
+                iframe.style.height = data.height + 'px';
             }
+        }
+    });
+};
 
-            const data = e.data;
-
-            if (data.type === 'CS_COMPLETE') {
-                Ajax.call([{
-                    methodname: 'mod_coursestudio_submit_grade',
-                    args: {
-                        cmid: cmid,
-                        score: parseFloat(data.score) || 0
-                    },
-                    fail: Notification.exception
-                }]);
-            }
-
-            if (data.type === 'CS_RESIZE' && data.height) {
-                const iframe = document.getElementById('cs-iframe-' + cmid);
-                if (iframe) {
-                    iframe.style.height = data.height + 'px';
-                }
-            }
-        });
-    }
-
-    return {
-        init: init
-    };
-});
+export default {
+    init,
+};
