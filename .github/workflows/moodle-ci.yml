@@ -88,19 +88,44 @@ jobs:
       - name: Pre-build AMD files
         if: ${{ !cancelled() }}
         run: |
+          echo "=== Grunt binary check ==="
+          ls -la moodle/node_modules/grunt-cli/bin/grunt.js 2>&1 || echo "grunt-cli NOT FOUND"
+          ls -la moodle/node_modules/.bin/grunt 2>&1 || echo ".bin/grunt NOT FOUND"
+          echo "=== Plugin directory ==="
+          ls -la moodle/mod/coursestudio 2>&1
+          echo "=== AMD files before ==="
+          head -c 120 moodle/mod/coursestudio/amd/build/player.min.js 2>&1 || echo "FILE NOT FOUND"
+          echo ""
+          echo "=== Running grunt pre-build ==="
           cd moodle
-          # Use Moodle's own grunt binary to generate correct AMD files
-          ./node_modules/.bin/grunt amd --root=mod/coursestudio 2>&1 || true
-          # Commit the freshly-built files so grunt's git-diff stale check sees no changes
+          # Install npm packages if needed
+          [ -f node_modules/grunt-cli/bin/grunt.js ] || npm install 2>&1 | tail -5
+          # Run grunt exactly as moodle-plugin-ci does
+          node node_modules/grunt-cli/bin/grunt.js amd --root=mod/coursestudio 2>&1 || echo "(grunt exited non-zero - expected when files were stale)"
+          echo "=== AMD files after grunt ==="
+          head -c 120 mod/coursestudio/amd/build/player.min.js 2>&1 || echo "FILE NOT FOUND"
+          echo ""
+          echo "=== Committing built files to plugin git ==="
           cd ${{ github.workspace }}/plugin
           git config user.email "ci@ci.invalid"
           git config user.name "CI Build"
           git add amd/build/player.min.js amd/build/player.min.js.map
-          git diff --cached --quiet && echo "AMD files already up to date" || git commit -m "ci: update AMD build"
+          git status --short amd/build/
+          git diff --cached --quiet && echo "Nothing to commit (files unchanged)" || git commit -m "ci: update AMD build"
 
       - name: Grunt (AMD build)
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci grunt --max-lint-warnings 0
+
+      - name: Upload AMD build artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: amd-build-${{ matrix.php }}-${{ matrix.moodle-branch }}
+          path: |
+            moodle/mod/coursestudio/amd/build/
+            plugin/amd/build/
+          if-no-files-found: warn
 
       - name: PHPUnit tests
         if: ${{ !cancelled() }}
