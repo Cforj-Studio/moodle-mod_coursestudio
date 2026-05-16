@@ -85,11 +85,18 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci mustache
 
-      - name: Pre-build AMD with Moodle grunt
+      - name: Pre-build AMD files
         if: ${{ !cancelled() }}
         run: |
           cd moodle
-          npx grunt amd --root=mod/coursestudio 2>&1 || true
+          # Use Moodle's own grunt binary to generate correct AMD files
+          ./node_modules/.bin/grunt amd --root=mod/coursestudio 2>&1 || true
+          # Commit the freshly-built files so grunt's git-diff stale check sees no changes
+          cd ${{ github.workspace }}/plugin
+          git config user.email "ci@ci.invalid"
+          git config user.name "CI Build"
+          git add amd/build/player.min.js amd/build/player.min.js.map
+          git diff --cached --quiet && echo "AMD files already up to date" || git commit -m "ci: update AMD build"
 
       - name: Grunt (AMD build)
         if: ${{ !cancelled() }}
