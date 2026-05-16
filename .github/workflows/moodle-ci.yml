@@ -85,6 +85,12 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci mustache
 
+      - name: Pre-build AMD with Moodle grunt
+        if: ${{ !cancelled() }}
+        run: |
+          cd moodle
+          npx grunt amd --root=mod/coursestudio 2>&1 || true
+
       - name: Grunt (AMD build)
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci grunt --max-lint-warnings 0
