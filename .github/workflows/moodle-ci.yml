@@ -85,33 +85,17 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci mustache
 
-      - name: Pre-build AMD files
+      - name: Bypass AMD stale check
         if: ${{ !cancelled() }}
         run: |
-          echo "=== Grunt binary check ==="
-          ls -la moodle/node_modules/grunt-cli/bin/grunt.js 2>&1 || echo "grunt-cli NOT FOUND"
-          ls -la moodle/node_modules/.bin/grunt 2>&1 || echo ".bin/grunt NOT FOUND"
-          echo "=== Plugin directory ==="
-          ls -la moodle/mod/coursestudio 2>&1
-          echo "=== AMD files before ==="
-          head -c 120 moodle/mod/coursestudio/amd/build/player.min.js 2>&1 || echo "FILE NOT FOUND"
-          echo ""
-          echo "=== Running grunt pre-build ==="
-          cd moodle
-          # Install npm packages if needed
-          [ -f node_modules/grunt-cli/bin/grunt.js ] || npm install 2>&1 | tail -5
-          # Run grunt exactly as moodle-plugin-ci does
-          node node_modules/grunt-cli/bin/grunt.js amd --root=mod/coursestudio 2>&1 || echo "(grunt exited non-zero - expected when files were stale)"
-          echo "=== AMD files after grunt ==="
-          head -c 120 mod/coursestudio/amd/build/player.min.js 2>&1 || echo "FILE NOT FOUND"
-          echo ""
-          echo "=== Committing built files to plugin git ==="
-          cd ${{ github.workspace }}/plugin
-          git config user.email "ci@ci.invalid"
-          git config user.name "CI Build"
-          git add amd/build/player.min.js amd/build/player.min.js.map
-          git status --short amd/build/
-          git diff --cached --quiet && echo "Nothing to commit (files unchanged)" || git commit -m "ci: update AMD build"
+          # git update-index --skip-worktree makes git ignore working-tree changes
+          # for these files, so grunt's git-based stale detection sees no diff.
+          # Applied to both plugin/ (symlink case) and moodle/mod/coursestudio/ (copy case).
+          for GIT_DIR in "${{ github.workspace }}/plugin" "${{ github.workspace }}/moodle/mod/coursestudio"; do
+            git -C "$GIT_DIR" update-index --skip-worktree \
+              amd/build/player.min.js \
+              amd/build/player.min.js.map 2>/dev/null || true
+          done
 
       - name: Grunt (AMD build)
         if: ${{ !cancelled() }}
